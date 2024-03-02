@@ -1264,6 +1264,7 @@ int main(int argc, const char * argv[])
     int new_sd;
     int close_conn;
     struct timeval timeout;
+	uint64_t last_check_time = currentUSecsSinceEpoch();
     
     // Loop waiting for incoming connects or for incoming data
     do
@@ -1286,10 +1287,12 @@ int main(int argc, const char * argv[])
             break;
         }
         
-        // Check to see if select call timed out.
-        if (rc == 0)
-        {
-            // perform periodic session tasks
+		uint64_t now = currentUSecsSinceEpoch();
+		if (rc == 0 ||
+			now - last_check_time > 2000000)
+		{
+			last_check_time = now;
+            // perform periodic session tasks every 2 seconds
             
             for (i=0; i <= max_sd; ++i)
             {
@@ -1322,10 +1325,14 @@ int main(int argc, const char * argv[])
                         }
                     }
             }
-            
-            continue;
         }
         
+        // Check to see if select call timed out.
+        if (rc == 0)
+        {
+            continue;
+        }
+
         /**********************************************************/
         /* One or more descriptors are readable.  Need to         */
         /* determine which ones they are.                         */
