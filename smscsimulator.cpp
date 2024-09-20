@@ -350,7 +350,8 @@ public:
 
         szTimestamp[0] = 0x00;
         
-        tm* ptm = gmtime( &t );
+        // tm* ptm = gmtime( &t );
+        tm* ptm = localtime( &t );
 
         if ( ptm == NULL ) szTimestamp[0] = 0x00;
         else strftime( szTimestamp, nLen, "%y%m%d%H%M", ptm );
