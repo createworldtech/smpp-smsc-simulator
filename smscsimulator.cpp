@@ -1267,9 +1267,16 @@ int main(int argc, const char * argv[])
     struct timeval timeout;
 	uint64_t last_check_time = currentUSecsSinceEpoch();
     
+	time_t next_srand_time = time(NULL);
+
     // Loop waiting for incoming connects or for incoming data
     do
     {
+		if (time(NULL) >= next_srand_time) {
+			next_srand_time += 24*3600;
+			srand(time(NULL));
+		}
+
         // Copy the master fd_set over to the working fd_set.
         memcpy(&working_set, &master_set, sizeof(master_set));
         
